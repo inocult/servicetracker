@@ -1,0 +1,817 @@
+<!DOCTYPE html>
+<html lang='en'>
+
+<head>
+  <meta charset='utf-8' />
+  <title>Connectivity Tracker</title>
+  <meta name='viewport' content='width=device-width, initial-scale=1' />
+  <script src='https://api.tiles.mapbox.com/mapbox-gl-js/v2.3.0/mapbox-gl.js'></script>
+  <link href='https://api.tiles.mapbox.com/mapbox-gl-js/v2.3.0/mapbox-gl.css' rel='stylesheet' />
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+    }
+
+    #map {
+      position: absolute;
+      top: 55px;
+      bottom: 0;
+      width: 100%;
+    }
+
+    .map-overlay {
+      background-color: #fff;
+    }
+
+    .divTable {
+      display: table;
+      width: auto;
+      /*   background-color:#eee;
+       border:1px solid  #666666;
+       border-spacing:5px; */
+      /*cellspacing:poor IE support for  this*/
+      /* border-collapse:separate;*/
+    }
+
+    .divRow {
+      display: table-row;
+      width: auto;
+    }
+
+    .divCell {
+      float: left;
+      /*fix for  buggy browsers*/
+      display: table-column;
+      width: 50px;
+      /*   background-color:#ccc;*/
+    }
+  </style>
+  <link rel="stylesheet" href="css/style_highSpeed.css">
+</head>
+
+<body>
+
+  <!-- Load the `mapbox-gl-geocoder` plugin. -->
+  <script src="https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-geocoder/v4.7.0/mapbox-gl-geocoder.min.js"></script>
+  <link rel="stylesheet" href="https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-geocoder/v4.7.0/mapbox-gl-geocoder.css" type="text/css">
+
+  <!-- Promise polyfill script is required -->
+  <!-- to use Mapbox GL Geocoder in IE 11. -->
+  <script src="https://cdn.jsdelivr.net/npm/es6-promise@4/dist/es6-promise.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/es6-promise@4/dist/es6-promise.auto.min.js"></script>
+
+  <!-- Adds the title and legend -->
+  <div class="map-overlay">
+    <h3 align="center">Legend</h3>
+    <img src="img\fiber_home_1.svg" alt="Girl in a jacket" width="70" height="50">
+    <img src="img\wireless_home_1.svg" alt="Girl in a jacket" width="70" height="50">
+    <img src="img\nodata_home_1.svg" alt="Girl in a jacket" width="70" height="50">
+    <br>
+    <!--    <h6> &nbsp &nbsp &nbsp &nbsp Fiber &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp Wireless &nbsp &nbsp Coming Soon</h6> -->
+  </div>
+
+
+  <div class="verticalHeader">
+    <div class="locationWrapper">
+      <h2 class="locationTitle">Pictou, NS</h2><span><svg width="16" height="15" viewBox="0 0 16 15" fill="none" role="img" aria-label="Sélectionner l’icône des favoris">
+          <title>Sélectionner l’icône des favoris</title>
+          <path fill-rule="evenodd" clip-rule="evenodd"
+            d="M8.37690005,0.342171 L9.90618005,4.939281 C9.97415005,5.143601 10.1653001,5.281451 10.3806001,5.281451 L15.3040001,5.281451 C15.7912001,5.281451 15.9907001,5.907251 15.5933001,6.189211 L11.6307001,9.001301 C11.4513001,9.128501 11.3762001,9.358101 11.4456001,9.566801 L12.9640001,14.131101 C13.1165001,14.589701 12.5943001,14.976401 12.2002001,14.696701 L8.19182005,11.852301 C8.01852005,11.729301 7.78641005,11.729301 7.61310005,11.852301 L3.60477005,14.696701 C3.21062005,14.976401 2.68841005,14.589701 2.84097005,14.131101 L4.35933005,9.566801 C4.42876005,9.358101 4.35364005,9.128501 4.17425005,9.001301 L0.21158805,6.189211 C-0.18574295,5.907251 0.0137411505,5.281451 0.50094905,5.281451 L5.42430005,5.281451 C5.63963005,5.281451 5.83077005,5.143601 5.89874005,4.939281 L7.42802005,0.342171 C7.57979005,-0.114057 8.22513005,-0.114057 8.37690005,0.342171 Z M8.13868005,4.234401 C8.06279005,4.006281 7.74013005,4.006281 7.66424005,4.234401 L6.89960005,6.532951 C6.86562005,6.635111 6.77004005,6.704041 6.66238005,6.704041 L4.20070005,6.704041 C3.95710005,6.704041 3.85736005,7.016941 4.05602005,7.157921 L6.03735005,8.563941 C6.12705005,8.627591 6.16461005,8.742381 6.12989005,8.846731 L5.37071005,11.128901 C5.29444005,11.358201 5.55554005,11.551501 5.75261005,11.411701 L7.75678005,9.989401 C7.84343005,9.927901 7.95949005,9.927901 8.04614005,9.989401 L10.0503001,11.411701 C10.2474001,11.551501 10.5085001,11.358201 10.4322001,11.128901 L9.67303005,8.846731 C9.63831005,8.742381 9.67587005,8.627591 9.76556005,8.563941 L11.7469001,7.157921 C11.9456001,7.016941 11.8458001,6.704041 11.6022001,6.704041 L9.14054005,6.704041 C9.03287005,6.704041 8.93730005,6.635111 8.90332005,6.532951 L8.13868005,4.234401 Z"
+            fill="#767676"></path>
+        </svg> </span>
+    </div>
+    <div class="verticalOptions" style="grid-template-columns: repeat(4, min-content);">
+      <div class="verticalOption selected" tabindex="0">Services</div>
+    <!--  <div class="verticalOption " tabindex="0">Vaccins</div>
+      <div class="verticalOption " tabindex="0">Actualités et vidéos</div>
+      <div class="verticalOption " tabindex="0">Graphiques</div> -->
+      <div class="verticalIndicator" style="transform: translateX(0px) scaleX(1);"></div>
+    </div>
+  </div>
+  <div id='map'></div>
+
+
+
+  <div class="overview" role="complementary" aria-label="Vue d’ensemble">
+    <div class="overviewContent">
+      <div class="pageName">
+        <h3>Overview</h3>
+      </div>
+      <div>
+        <div class="infoTile" style="width: 244px;">
+          <div class="infoTileHeader">
+            <div>
+              <h2 class="title" title="Doses de vaccin
+administrées">Data Utility</h2>
+            </div>
+            <div class="infoTileIconCon"></div>
+          </div>
+          <div class="infoTileDosesAdministered">
+            <div class="dosesAdministered">768</div>
+            <div class="deltaConfirmed" title="Nouveaux cas au cours des dernières
+24&nbsp;heures">+768</div>
+          </div>
+          <div class="bar">
+            <div class="slice" style="background: rgb(221, 221, 221); width: 244px; position:relative;"></div>
+            <div class="slice" style="background: rgb(176, 211, 105); width: 20.79px; left: -244px; position: relative;"></div>
+            <div class="slice" style="background: rgb(58, 154, 80); width: 1.125px; left: -451.79px; position: relative;"></div>
+          </div>
+          <div class="infoTileData">
+            <h2 class="legend">
+              <div class="color" style="background: rgb(58, 154,80);"></div>
+              <div class="description">% Pop. In Service</div>
+              <div class="total">0%</div>
+            </h2>
+            <h2 class="legend">
+              <div class="color" style="background:rgb(176, 211, 105);"></div>
+              <div class="description">% Pop. Passed</div>
+              <div class="total ">5.5%</div>
+            </h2>
+          </div>
+          <div class="infoTileConfirmedHeader">
+            <div>
+              <h2 class="title" title="Nombre total de
+cas confirmés">Rapid Deployment Network</h2>
+            </div>
+          </div>
+          <div class="infoTileConfirmed">
+            <div class="confirmed">2&nbsp;112</div>
+            <div class="deltaConfirmed" title="Nouveaux cas au cours des dernières
+24&nbsp;heures">+2&nbsp;112</div>
+          </div>
+          <div class="infoTileData">
+            <h2 class="legend">
+              <div class="color" style="background: rgb(58, 154,80);"></div>
+              <div class="description">% Pop. In Service</div>
+              <div class="total">0%</div>
+            </h2>
+            <h2 class="legend">
+              <div class="color" style="background:rgb(176, 211, 105);"></div>
+              <div class="description">% Pop. Passed</div>
+              <div class="total ">15.68%</div>
+            </h2>
+          </div>
+        </div>
+      </div>
+      <div class="segmentPanel">
+        <!--      <div class="segmentTitleSection">
+          <h4 class="segmentTitle">Tendances</h4>
+        </div>
+        <div>
+          <div class="col-6">
+            <div class="infoTile graph">
+              <div class="graphTitle">
+                <div>Tendance de propagation
+                  quotidienne</div>
+                <div>Agrandir<svg width="10" height="10" viewBox="0 0 12 12" fill="none">
+                    <path d="M12 4.28571C12 4.7591 11.6162 5.14286 11.1429
+5.14286C10.6695 5.14286 10.2857 4.7591 10.2857 4.28571V2.92629L2.92629
+10.2857H4.28571C4.7591 10.2857 5.14286 10.6695 5.14286 11.1429C5.14286 11.6162
+4.7591 12 4.28571 12H0.642857C0.287817 12 0 11.7122 0 11.3571V7.71429C0 7.2409
+0.383756 6.85714 0.857143 6.85714C1.33053 6.85714 1.71429 7.2409 1.71429
+7.71429V9.07372L9.07372 1.71429H7.71429C7.2409 1.71429 6.85714 1.33053 6.85714
+0.857143C6.85714 0.383756 7.2409 0 7.71429 0H11.3571C11.7122 0 12 0.287817 12
+0.642857V4.28571Z" fill="#767676"></path>
+                  </svg></div>
+              </div>
+              <div class="chartFilterLine">
+                <div class="selectBox">
+                  <div class="ms-Dropdown-container
+newCasesLineChartContainer">
+                    <div data-is-focusable="true" id="Dropdown21" tabindex="0" role="combobox" aria-haspopup="listbox" aria-expanded="false" class="ms-Dropdown dropdown-85"><span id="Dropdown21-option"
+                        class="ms-Dropdown-title newcasesLineChartTitleStyle title-86" aria-live="polite" aria-atomic="true">Nouveaux cas</span><span class="ms-Dropdown-caretDownWrapper caretDownWrapper-87"><i data-icon-name="ChevronDown"
+                          aria-hidden="true" class="ms-Dropdown-caretDown
+caretDown-101"></i></span></div>
+                  </div>
+                </div>
+                <div class="selectBox">
+                  <div class="ms-Dropdown-container newCasesLineChartContainer">
+                    <div data-is-focusable="true" id="Dropdown22" tabindex="0" role="combobox" aria-haspopup="listbox" aria-expanded="false" class="ms-Dropdown
+dropdown-85"><span id="Dropdown22-option" class="ms-Dropdown-title
+newcasesLineChartTitleStyle title-86" aria-live="polite" aria-atomic="true">Tout
+                        le temps</span><span class="ms-Dropdown-caretDownWrapper caretDownWrapper-87"><i data-icon-name="ChevronDown" aria-hidden="true" class="ms-Dropdown-caretDown
+caretDown-101"></i></span></div>
+                  </div>
+                </div>
+              </div>
+              <div class="echarts-for-react
+" _echarts_instance_="ec_1632131400257" size-sensor-id="1" style="height: 240px;
+width: 100%; -webkit-tap-highlight-color: transparent; user-select: none;
+position: relative;">
+                <div style="position: relative; width: 266px; height:
+240px; padding: 0px; margin: 0px; border-width: 0px; cursor: default;"><canvas data-zr-dom-id="zr_0" width="266" height="240" style="position: absolute; left:
+0px; top: 0px; width: 266px; height: 240px; user-select: none;
+-webkit-tap-highlight-color: rgba(0, 0, 0, 0); padding: 0px; margin: 0px;
+border-width: 0px;"></canvas></div>
+                <div style="position: absolute; display:
+none; border-style: solid; white-space: nowrap; z-index: 9999999; transition:
+left 0.4s cubic-bezier(0.23, 1, 0.32, 1) 0s, top 0.4s cubic-bezier(0.23, 1,
+0.32, 1) 0s; background-color: rgb(255, 255, 255); border-width: 1px;
+border-color: rgba(0, 0, 0, 0.1); border-radius: 4px; color: rgb(68, 68, 68);
+font: 13px / 20px &quot;Microsoft YaHei&quot;; text-align: left; padding: 5px;
+left: -117px; top: 73px; box-shadow: rgba(0, 0, 0, 0.05) 0px 3px 5px;
+pointer-events: none;">26 mai 2020<br><span style="display:inline-block;margin-right:5px;border-radius:10px;width:10px;height:10px;background-color:rgb(255,89,34,
+0.4);"></span>Nouveaux cas: 870<br><span style="display:inline-block;margin-right:5px;border-radius:10px;width:10px;height:10px;background-color:rgb(255,89,34,
+1.0);"></span>Moyenne sur 7 jours: 938.5</div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="seeMoreContainer zeroPadding">
+          <div class="seeMoreButton
+seeMoreChartButton"><span>Afficher d’autres graphiques</span> <svg width="12px" height="7px" viewBox="0 0 12 7">
+              <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+                <g id="Artboard-2" transform="translate(-184.000000, -180.000000)">
+                  <g id="ChevronDown-16px" transform="translate(184.000000, 177.000000)">
+                    <path d="M0.228632851,4.28948475
+L5.47056487,9.53948475 C5.76298968,9.8322712 6.23701032,9.8322712
+6.52943513,9.53948475 L11.7713671,4.28948475 C11.966035,4.10117889
+12.0441068,3.82232633 11.9755757,3.56010425 C11.9070446,3.29788218
+11.7025756,3.09309846 11.4407565,3.02446188 C11.1789374,2.9558253
+10.9005134,3.03401731 10.7124969,3.22898475 L6,7.94873475 L1.28750312,3.22898475
+C1.09948665,3.03401731 0.821062609,2.9558253 0.559243507,3.02446188
+C0.297424405,3.09309846 0.0929553881,3.29788218 0.0244242856,3.56010425
+C-0.044106817,3.82232633 0.0339650303,4.10117889 0.228632851,4.28948475 Z" id="Shape" fill="#767676" fill-rule="nonzero"></path>
+                    <polygon id="Shape" points="12 12 0 12 0 0 12 0"></polygon>
+                  </g>
+                </g>
+              </g>
+            </svg></div>
+        </div>
+        <div class="graphTitle">
+          <div>Principales régions par cas confirmés</div>
+        </div>
+        <div class="infoTile rawDataList">
+          <div class="ms-Viewport" style="min-width: 1px;
+min-height: 1px;">
+            <div class="ms-DetailsList is-horizontalConstrained root-40" data-automationid="DetailsList" data-is-scrollable="false">
+              <div role="grid" aria-rowcount="6" aria-colcount="2" aria-readonly="true">
+                <div role="presentation" class="ms-DetailsList-headerWrapper">
+                  <div role="row" class="ms-FocusZone css-58 ms-DetailsHeader root-42" data-automationid="DetailsHeader" data-focuszone-id="FocusZone13">
+                    <div role="columnheader" aria-sort="none" aria-colindex="1" class="ms-DetailsHeader-cell is-actionable rawDataListHeader root-59" data-is-draggable="false" draggable="false" data-automationid="ColumnsHeaderColumn"
+                      data-item-key="Canada" style="width:
+142px;"><span class="cellTooltip-67"><span id="header12-Canada" aria-labelledby="header12-Canada-name" class="ms-DetailsHeader-cellTitle
+cellTitle-65" data-is-focusable="true" aria-haspopup="false" tabindex="0"><span id="header12-Canada-name" class="ms-DetailsHeader-cellName
+cellName-66">Canada</span></span></span></div>
+                    <div role="columnheader" aria-sort="descending" aria-colindex="2" class="ms-DetailsHeader-cell
+is-actionable is-icon-visible rawDataListHeader root-59" data-is-draggable="false" draggable="false" data-automationid="ColumnsHeaderColumn" data-item-key="Confirmés" style="width:
+100px;"><span class="cellTooltip-67"><span id="header12-Confirmés" aria-labelledby="header12-Confirmés-name" class="ms-DetailsHeader-cellTitle
+cellTitle-72" data-is-focusable="true" role="button" aria-haspopup="false" tabindex="-1"><span id="header12-Confirmés-name" class="ms-DetailsHeader-cellName cellName-66">Confirmés</span><i data-icon-name="SortDown" role="presentation"
+                            aria-hidden="true" class="ms-Icon
+root-37 css-73 sortIcon-62" style="font-family:
+FabricMDL2Icons;"></i></span></span></div>
+                  </div>
+                </div>
+                <div role="presentation" class="ms-DetailsList-contentWrapper">
+                  <div class="ms-SelectionZone" role="presentation">
+                    <div class="ms-FocusZone css-58 focusZone-41" data-focuszone-id="FocusZone14">
+                      <div class="ms-List" role="presentation">
+                        <div role="presentation" class="ms-List-surface">
+                          <div class="ms-List-page" role="presentation">
+                            <div role="presentation" class="ms-List-cell" data-list-index="0" data-automationid="ListCell">
+                              <div data-is-focusable="true" id="row23-0" role="row" class="ms-FocusZone css-58 ms-DetailsRow root-75" data-selection-index="0" data-selection-touch-invoke="true" data-item-index="0" aria-rowindex="1"
+                                data-automationid="DetailsRow" data-focuszone-id="FocusZone16" style="min-width: 202px;">
+                                <div class="ms-DetailsRow-fields fields-82" data-automationid="DetailsRowFields" role="presentation">
+                                  <div role="gridcell" aria-readonly="true" aria-colindex="1" class="ms-DetailsRow-cell cell-78
+cellUnpadded-76" data-automationid="DetailsRowCell" data-automation-key="Canada" style="width: 142px;">
+                                    <div class="rdListRegionTitle">Ontario</div>
+                                  </div>
+                                  <div role="gridcell" aria-readonly="true" aria-colindex="2" class="ms-DetailsRow-cell
+cell-78 cellUnpadded-76" data-automationid="DetailsRowCell" data-automation-key="Confirmés" style="width: 100px;">
+                                    <div class="rdListValue">587&nbsp;229<div class="rdListValueDelta">+537</div>
+                                    </div>
+                                  </div>
+                                </div><span role="checkbox" class="checkCover-81" aria-checked="false" data-selection-toggle="true"></span>
+                              </div>
+                            </div>
+                            <div role="presentation" class="ms-List-cell" data-list-index="1" data-automationid="ListCell">
+                              <div data-is-focusable="true" id="row23-1" role="row" class="ms-FocusZone css-58
+ms-DetailsRow root-75" data-selection-index="1" data-selection-touch-invoke="true" data-item-index="1" aria-rowindex="2" data-automationid="DetailsRow" data-focuszone-id="FocusZone17" style="min-width:
+202px;">
+                                <div class="ms-DetailsRow-fields fields-82" data-automationid="DetailsRowFields" role="presentation">
+                                  <div role="gridcell" aria-readonly="true" aria-colindex="1" class="ms-DetailsRow-cell cell-78
+cellUnpadded-76" data-automationid="DetailsRowCell" data-automation-key="Canada" style="width: 142px;">
+                                    <div class="rdListRegionTitle">Québec</div>
+                                  </div>
+                                  <div role="gridcell" aria-readonly="true" aria-colindex="2" class="ms-DetailsRow-cell
+cell-78 cellUnpadded-76" data-automationid="DetailsRowCell" data-automation-key="Confirmés" style="width: 100px;">
+                                    <div class="rdListValue">401&nbsp;462<div class="rdListValueDelta">0</div>
+                                    </div>
+                                  </div>
+                                </div><span role="checkbox" class="checkCover-81" aria-checked="false" data-selection-toggle="true"></span>
+                              </div>
+                            </div>
+                            <div role="presentation" class="ms-List-cell" data-list-index="2" data-automationid="ListCell">
+                              <div data-is-focusable="true" id="row23-2" role="row" class="ms-FocusZone css-58
+ms-DetailsRow root-75" data-selection-index="2" data-selection-touch-invoke="true" data-item-index="2" aria-rowindex="3" data-automationid="DetailsRow" data-focuszone-id="FocusZone18" style="min-width:
+202px;">
+                                <div class="ms-DetailsRow-fields fields-82" data-automationid="DetailsRowFields" role="presentation">
+                                  <div role="gridcell" aria-readonly="true" aria-colindex="1" class="ms-DetailsRow-cell cell-78
+cellUnpadded-76" data-automationid="DetailsRowCell" data-automation-key="Canada" style="width: 142px;">
+                                    <div class="rdListRegionTitle">Alberta</div>
+                                  </div>
+                                  <div role="gridcell" aria-readonly="true" aria-colindex="2" class="ms-DetailsRow-cell
+cell-78 cellUnpadded-76" data-automationid="DetailsRowCell" data-automation-key="Confirmés" style="width: 100px;">
+                                    <div class="rdListValue">277&nbsp;558<div class="rdListValueDelta">0</div>
+                                    </div>
+                                  </div>
+                                </div><span role="checkbox" class="checkCover-81" aria-checked="false" data-selection-toggle="true"></span>
+                              </div>
+                            </div>
+                            <div role="presentation" class="ms-List-cell" data-list-index="3" data-automationid="ListCell">
+                              <div data-is-focusable="true" id="row23-3" role="row" class="ms-FocusZone css-58
+ms-DetailsRow root-75" data-selection-index="3" data-selection-touch-invoke="true" data-item-index="3" aria-rowindex="4" data-automationid="DetailsRow" data-focuszone-id="FocusZone19" style="min-width:
+202px;">
+                                <div class="ms-DetailsRow-fields fields-82" data-automationid="DetailsRowFields" role="presentation">
+                                  <div role="gridcell" aria-readonly="true" aria-colindex="1" class="ms-DetailsRow-cell cell-78
+cellUnpadded-76" data-automationid="DetailsRowCell" data-automation-key="Canada" style="width: 142px;">
+                                    <div class="rdListRegionTitle">Colombie-Britannique</div>
+                                  </div>
+                                  <div role="gridcell" aria-readonly="true" aria-colindex="2" class="ms-DetailsRow-cell cell-78
+cellUnpadded-76" data-automationid="DetailsRowCell" data-automation-key="Confirmés" style="width: 100px;">
+                                    <div class="rdListValue">177&nbsp;954<div class="rdListValueDelta">0</div>
+                                    </div>
+                                  </div>
+                                </div><span role="checkbox" class="checkCover-81" aria-checked="false" data-selection-toggle="true"></span>
+                              </div>
+                            </div>
+                            <div role="presentation" class="ms-List-cell" data-list-index="4" data-automationid="ListCell">
+                              <div data-is-focusable="true" id="row23-4" role="row" class="ms-FocusZone css-58
+ms-DetailsRow root-75" data-selection-index="4" data-selection-touch-invoke="true" data-item-index="4" aria-rowindex="5" data-automationid="DetailsRow" data-focuszone-id="FocusZone20" style="min-width:
+202px;">
+                                <div class="ms-DetailsRow-fields fields-82" data-automationid="DetailsRowFields" role="presentation">
+                                  <div role="gridcell" aria-readonly="true" aria-colindex="1" class="ms-DetailsRow-cell cell-78
+cellUnpadded-76" data-automationid="DetailsRowCell" data-automation-key="Canada" style="width: 142px;">
+                                    <div class="rdListRegionTitle">Saskatchewan</div>
+                                  </div>
+                                  <div role="gridcell" aria-readonly="true" aria-colindex="2" class="ms-DetailsRow-cell cell-78
+cellUnpadded-76" data-automationid="DetailsRowCell" data-automation-key="Confirmés" style="width: 100px;">
+                                    <div class="rdListValue">61&nbsp;065<div class="rdListValueDelta">0</div>
+                                    </div>
+                                  </div>
+                                </div><span role="checkbox" class="checkCover-81" aria-checked="false" data-selection-toggle="true"></span>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="seeMoreContainer zeroPadding">
+          <div class="seeMoreButton
+seeMoreWithoutLongText"><span>Afficher plus</span> <svg width="12px" height="7px" viewBox="0 0 12 7">
+              <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+                <g id="Artboard-2" transform="translate(-184.000000, -180.000000)">
+                  <g id="ChevronDown-16px" transform="translate(184.000000, 177.000000)">
+                    <path d="M0.228632851,4.28948475
+L5.47056487,9.53948475 C5.76298968,9.8322712 6.23701032,9.8322712
+6.52943513,9.53948475 L11.7713671,4.28948475 C11.966035,4.10117889
+12.0441068,3.82232633 11.9755757,3.56010425 C11.9070446,3.29788218
+11.7025756,3.09309846 11.4407565,3.02446188 C11.1789374,2.9558253
+10.9005134,3.03401731 10.7124969,3.22898475 L6,7.94873475 L1.28750312,3.22898475
+C1.09948665,3.03401731 0.821062609,2.9558253 0.559243507,3.02446188
+C0.297424405,3.09309846 0.0929553881,3.29788218 0.0244242856,3.56010425
+C-0.044106817,3.82232633 0.0339650303,4.10117889 0.228632851,4.28948475 Z" id="Shape" fill="#767676" fill-rule="nonzero"></path>
+                    <polygon id="Shape" points="12 12 0 12 0 0 12 0"></polygon>
+                  </g>
+                </g>
+              </g>
+            </svg></div>
+        </div> -->
+        <h4 class="segmentTitle usefulInformationTitle ">Local Resources</h4>
+        <div class="usefulInformationCard infoTile">
+          <div class="infoContainer">
+            <div class="infoContainer"><a href="https://ruralnet.munpict.ca/" target="_blank" class="usefulInformationTitle">MOPC - Rural Internet Website</a>
+              <div class="provider">
+                <div class="providerName
+usefulInformationProvider">munpict.ca</div>
+              </div>
+              <div class="usefulInformationOtherAttributes">
+                <div class="providerName">Phone:<a href="tel:1-902-485-2238" target="_blank" class="&quot;providerName&quot; ">1-902-485-2238</a></div>
+                <div class="providerName">Email:<a href="mailto:internet@munpict.ca" target="_blank" class="&quot;providerName&quot;email">internet@munpict.ca</a></div>
+              </div>
+            </div>
+        <!--    <div class="infoContainer"><a href="https://www.canada.ca/en/public-health/services/diseases/2019-novel-coronavirus-infection/canadas-reponse/government-canada-takes-action-covid-19.html" target="_blank"
+                class="usefulInformationTitle">Government of Canada's
+                response</a>
+              <div class="provider">
+                <div class="providerName
+usefulInformationProvider">canada.ca</div>
+              </div>
+            </div>
+            <div class="infoContainer"><a href="https://travel.gc.ca/travelling/advisories" target="_blank" class="usefulInformationTitle">Travel advisory</a>
+              <div class="provider">
+                <div class="providerName
+usefulInformationProvider">travel.gc.ca</div>
+              </div>
+            </div> -->
+          </div>
+          <div class="seeMoreUsefulInfo usefulInformationTitle">
+            <div class="seeMoreWithIcon">More</div>
+            <div><svg width="12px" height="7px" viewBox="0 0 12 7">
+                <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+                  <g id="Artboard-2" transform="translate(-184.000000,
+-180.000000)">
+                    <g id="ChevronDown-16px" transform="translate(184.000000,
+177.000000)">
+                      <path d="M0.228632851,4.28948475 L5.47056487,9.53948475
+C5.76298968,9.8322712 6.23701032,9.8322712 6.52943513,9.53948475
+L11.7713671,4.28948475 C11.966035,4.10117889 12.0441068,3.82232633
+11.9755757,3.56010425 C11.9070446,3.29788218 11.7025756,3.09309846
+11.4407565,3.02446188 C11.1789374,2.9558253 10.9005134,3.03401731
+10.7124969,3.22898475 L6,7.94873475 L1.28750312,3.22898475
+C1.09948665,3.03401731 0.821062609,2.9558253 0.559243507,3.02446188
+C0.297424405,3.09309846 0.0929553881,3.29788218 0.0244242856,3.56010425
+C-0.044106817,3.82232633 0.0339650303,4.10117889 0.228632851,4.28948475 Z" id="Shape" fill="#767676" fill-rule="nonzero"></path>
+                      <polygon id="Shape" points="12 12 0 12 0 0 12 0"></polygon>
+                    </g>
+                  </g>
+                </g>
+              </svg></div>
+          </div>
+        </div>
+        <h4 class="segmentTitle">Videos</h4>
+        <div class="videoContent"><a href="https://www.youtube.com/watch?v=bFxZbS8KJNc" target="_blank" class="apiContentLink videoCard ">
+            <div class="thumbnailContainer"><img class="videoImage" width="323px" height="184px" src="http://img.youtube.com/vi/bFxZbS8KJNc/0.jpg">
+              <div class="playIcon"><svg fill="none" height="32" viewBox="0 0 32 32" width="32">
+                  <rect fill="#000" fill-opacity=".7" height="30" rx="15" stroke="#fff" stroke-width="2" width="30" x="1" y="1"></rect>
+                  <path d="m12
+21.259v-10.518c0-.77175.8372-1.25263 1.5039-.86374l9.0153
+5.25894c.6615.3859.6615 1.3417 0 1.7276l-9.0153
+5.2589c-.6667.3889-1.5039-.0919-1.5039-.8637z" fill="#fff"></path>
+                </svg></div>
+              <div class="videoDur">01:47</div>
+            </div>
+            <div class="info">
+              <div class="title">MOPC FULL EDIT Cut 3</div>
+              <div class="videoTimestamp">23 days ago</div>
+              <div class="sourceContainer">
+                <div class="videoSource">YouTube · Unlisted</div>
+              </div>
+            </div>
+          </a><a href="#" target="_blank" class="apiContentLink videoCard miniVideoCard">
+            <div class="thumbnailContainer"><img class="videoImage" src="https://tse2.mm.bing.net/th?id=OVF.LtN6EOAy3tjiVFNsMvTXyQ&amp;pid=Api&amp;w=157&amp;h=88&amp;c=4">
+              <div class="playIcon"><svg fill="none" height="32" viewBox="0 0 32 32" width="32">
+                  <rect fill="#000" fill-opacity=".7" height="30" rx="15" stroke="#fff" stroke-width="2" width="30" x="1" y="1"></rect>
+                  <path d="m12
+21.259v-10.518c0-.77175.8372-1.25263 1.5039-.86374l9.0153
+5.25894c.6615.3859.6615 1.3417 0 1.7276l-9.0153
+5.2589c-.6667.3889-1.5039-.0919-1.5039-.8637z" fill="#fff"></path>
+                </svg></div>
+              <div class="videoDur">05:19</div>
+            </div>
+            <div class="info">
+              <div class="title">More than highspeed Internet</div>
+              <div class="videoTimestamp">3 years ago</div>
+              <div class="sourceContainer">
+                <div class="videoSource">YouTube · NBN</div>
+              </div>
+            </div>
+          </a><a href="#" target="_blank" class="apiContentLink videoCard miniVideoCard">
+            <div class="thumbnailContainer"><img class="videoImage" src="https://tse2.mm.bing.net/th?id=OVF.SZVavHSaPCjZDfnHnkb0aw&amp;pid=Api&amp;w=157&amp;h=88&amp;c=4">
+              <div class="playIcon"><svg fill="none" height="32" viewBox="0 0 32 32" width="32">
+                  <rect fill="#000" fill-opacity=".7" height="30" rx="15" stroke="#fff" stroke-width="2" width="30" x="1" y="1"></rect>
+                  <path d="m12
+21.259v-10.518c0-.77175.8372-1.25263 1.5039-.86374l9.0153
+5.25894c.6615.3859.6615 1.3417 0 1.7276l-9.0153
+5.2589c-.6667.3889-1.5039-.0919-1.5039-.8637z" fill="#fff"></path>
+                </svg></div>
+                <div class="videoDur">02:19</div>
+            </div>
+            <div class="info">
+              <div class="title">Future of Infrastructures</div>
+              <div class="videoTimestamp">1 year ago</div>
+              <div class="sourceContainer">
+                <div class="videoSource">Youtube - Unlisted</div>
+              </div>
+            </div>
+          </a>
+        </div><a href="https://www.bing.com/videos/search?q=coronavirus+Canada&amp;form=CODVDP" target="_blank" class="apiContentLink seeMoreContainer">
+          <div class="seeMoreButton">More Videos</div>
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <div class="upsellContainer" aria-label="Suivre les informations les plus récentes relatives au coronavirus sur votre téléphone">
+    <div class="floatingUpsell timeline" tabindex="0"><span class="title">Chronologie du COVID-19</span></div>
+    <div class="floatingUpsell " tabindex="0"><svg width="10" height="16" viewBox="0 0 10 16" fill="none">
+        <path fill-rule="evenodd" clip-rule="evenodd"
+          d="M1.5 0C0.671573 0 0 0.671573 0 1.5V14.5C0 15.3284 0.671573 16 1.5 16H8.5C9.32843 16 10 15.3284 10 14.5V1.5C10 0.671573 9.32843 0 8.5 0H6H4H1.5ZM3 1H2C1.44772 1 1 1.44772 1 2V14C1 14.5523 1.44772 15 2 15H8C8.55229 15 9 14.5523 9 14V2C9 1.44772 8.55229 1 8 1H7C7 1.55228 6.55228 2 6 2H4C3.44772 2 3 1.55228 3 1ZM3 13.5C3 13.2239 3.22386 13 3.5 13H6.5C6.77614 13 7 13.2239 7 13.5C7 13.7761 6.77614 14 6.5 14H3.5C3.22386 14 3 13.7761 3 13.5Z"
+          fill="white"></path>
+      </svg><span class="title">Suivre le coronavirus</span></div>
+    <div class="floatingUpsell  "><svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+        <path
+          d="M6.25 11.25H8.125V9.375H6.25V11.25ZM11.875 11.25H13.75V9.375H11.875V11.25ZM17.5 8.4375V6.875C17.5 5.8125 16.6875 5 15.625 5H10.625V3.625C11.1875 3.375 11.5625 2.8125 11.5625 2.1875C11.5625 1.3125 10.875 0.625 10 0.625C9.125 0.625 8.4375 1.3125 8.4375 2.1875C8.4375 2.8125 8.8125 3.375 9.375 3.625V5H4.375C3.3125 5 2.5 5.8125 2.5 6.875V8.4375C1.625 8.5625 0.9375 9.375 0.9375 10.3125C0.9375 11.25 1.625 12 2.5 12.1875V13.75C2.5 14.8125 3.3125 15.625 4.375 15.625H5.625V19.0625L12.1875 15.625H15.625C16.6875 15.625 17.5 14.8125 17.5 13.75V12.1875C18.375 12.0625 19.0625 11.25 19.0625 10.3125C19.0625 9.375 18.375 8.625 17.5 8.4375ZM16.25 13.75C16.25 14.125 16 14.375 15.625 14.375H11.875L11.625 14.5L6.875 17V14.375H4.375C4 14.375 3.75 14.125 3.75 13.75V6.875C3.75 6.5 4 6.25 4.375 6.25H15.625C16 6.25 16.25 6.5 16.25 6.875V13.75Z"
+          fill="#FFF"></path>
+      </svg><span class="title">Poser des questions sur le COVID-19</span></div>
+  </div>
+
+  <script>
+
+    // The value for 'accessToken' begins with 'pk...'
+    const popupTemplate = function(rdnSignal, year) {
+      let rdnColor = 'rgb(0,155,0)';
+      var rdnMaxSignal = -50;
+      var rdnMinSignal = -80;
+      let rdnPercent = 1;
+      let duAvailable =`<h6 style="color:rgb(0,155,0);">Service Available</h6>`;
+      let duYes = "Yes";
+      console.log(rdnPercent);
+      let rdnAvailable =`<h6 style="color:`+rdnColor+`;">Service Available</h6>`;
+      if (rdnSignal < -65 && rdnSignal > -80){
+        rdnColor = "rgb(155,155,0)";
+        rdnAvailable =`<h6 style="color:`+rdnColor+`;">Limited Availabibility</h6>`;
+        rdnPercent =  -(rdnSignal-rdnMinSignal)/(rdnMinSignal-rdnMaxSignal);
+      }
+      if (rdnSignal < -80){
+        rdnColor = "rgb(155,0,0)";
+        rdnAvailable =`<h6 style="color:`+rdnColor+`;">Service Unavailable</h6>`;
+        rdnPercent = 0;
+      }
+      if (year == 2021){
+        duAvailable =`<h6 style="color:rgb(155,0,0);">Service Unavailable</h6>`;
+        duYes="No";
+    }  return `<div class="infoTile" style="width: 200px;">
+      <div class="infoTileHeader">
+        <div>
+          <h2 style="font-size:1.3em;" class="title" title="Doses de vaccin
+administrées">Data Utility</h2>
+        </div>
+        <div class="infoTileIconCon"></div>
+      </div>
+      <div class="infoTileDosesAdministered">
+        <div class="dosesAdministered"></div>
+      </div>
+      <div>`+duAvailable+`</div>
+      <div class="infoTileData">
+        <h2 class="legend">
+          <div class="color" style="background: rgb(58, 154,80);"></div>
+          <div class="description">Residential Services<br> (Up to 1Gbps)</div>
+          <div class="total">`+duYes+`</div>
+        </h2>
+        <h2 class="legend">
+          <div class="color" style="background:rgb(55, 55, 55);"></div>
+          <div class="description">Commercial Services<br> (Up to 10Gbs)</div>
+          <div class="total ">No</div>
+        </h2>
+        <div style="margin-top:20px" class="deltaConfirmed">Estimated Date: 23/11/`+year+`*</div>
+      </div>
+
+      <div class="infoTileConfirmedHeader">
+        <div>
+        <h2 style="font-size:1.3em;" class="title" title="RDN">Rapid Deployment Network</h2>
+        </div>
+      </div>
+      <div><h6 style="color:green;">`+rdnAvailable+`
+      <div class="bar">
+        <div class="slice" style="background: rgb(221, 221, 221); width: 180px; position:relative;"></div>
+        <div class="slice" style="background:`+rdnColor+`; width: `+rdnPercent*180+`px; left: -180px; position: relative;"></div>
+        <!--<div class="slice" style="background: rgb(58, 154, 80); width: 1.125px; left: -451.79px; position: relative;"></div>-->
+      </div>
+      <div class="infoTileConfirmed">
+        <div style="color:`+rdnColor+`;" class="confirmed">`+Math.round(rdnPercent*50)+`Mbps</div>
+        <div class="deltaConfirmed" title="Nouveaux cas au cours des dernières
+24&nbsp;heures">Signal Strength: `+ rdnSignal + `</div>
+      </div>
+      <div style="margin-top:20px" class="deltaConfirmed">Estimated Date: 31/03/2022*</div>
+      <div style="font-size:0.8em;">*Represents worst case estimate</div>
+      </div>
+    </div>`;
+  }
+
+    const wirelesstemplate = `<div class="infoTile" style="width: 200px;">
+      <div class="infoTileHeader">
+        <div>
+          <h2 style="font-size:1.3em;" class="title" title="Doses de vaccin
+administrées">Data Utility</h2>
+        </div>
+        <div class="infoTileIconCon"></div>
+      </div>
+      <div class="infoTileDosesAdministered">
+        <div class="dosesAdministered"></div>
+      </div>
+      <div><h6 style="color:red;">Service Unavailable</h6></div>
+      <div class="infoTileData">
+        <h2 class="legend">
+          <div class="color" style="background: rgb(58, 154,80);"></div>
+          <div class="description">Residential Services<br> (Up to 1Gbps)</div>
+          <div class="total">No</div>
+        </h2>
+        <h2 class="legend">
+          <div class="color" style="background:rgb(55, 55, 55);"></div>
+          <div class="description">Commercial Services<br> (Up to 10Gbs)</div>
+          <div class="total ">No</div>
+        </h2>
+        <!-- <div style="margin-top:20px" class="deltaConfirmed">Estimated Date: </div> -->
+      </div>
+
+      <div class="infoTileConfirmedHeader">
+        <div>
+        <h2 style="font-size:1.3em;" class="title" title="Doses de vaccin
+administrées">Rapid Deployment Network</h2>
+        </div>
+      </div>
+      <div><h6 style="color:green;">Service Available</h6></div>
+      <div class="bar">
+        <div class="slice" style="background: rgb(221, 221, 221); width: 180px; position:relative;"></div>
+        <div class="slice" style="background: rgb(176, 211, 105); width: 90.79px; left: -180px; position: relative;"></div>
+        <!--<div class="slice" style="background: rgb(58, 154, 80); width: 1.125px; left: -451.79px; position: relative;"></div>-->
+      </div>
+      <div class="infoTileConfirmed">
+        <div style="color:green;" class="confirmed">50Mbps</div>
+        <div class="deltaConfirmed" title="Nouveaux cas au cours des dernières
+24&nbsp;heures">Signal Strength: -65dbm</div>
+      </div>
+      <div style="margin-top:20px" class="deltaConfirmed">Estimated Date: 12/02/2021</div>
+      </div>
+    </div>`;
+    const nothingtemplate = `<div class="infoTile" style="width: 200px;">
+      <div class="infoTileHeader">
+        <div>
+          <h2 style="font-size:1.3em;" class="title" title="Doses de vaccin
+administrées">Data Utility</h2>
+        </div>
+        <div class="infoTileIconCon"></div>
+      </div>
+      <div class="infoTileDosesAdministered">
+        <div class="dosesAdministered"></div>
+      </div>
+      <div><h6 style="color:red;">Service Unavailable</h6></div>
+      <div class="infoTileData">
+        <h2 class="legend">
+          <div class="color" style="background: rgb(58, 154,80);"></div>
+          <div class="description">Residential Services<br> (Up to 1Gbps)</div>
+          <div class="total">No</div>
+        </h2>
+        <h2 class="legend">
+          <div class="color" style="background:rgb(55, 55, 55);"></div>
+          <div class="description">Commercial Services<br> (Up to 10Gbs)</div>
+          <div class="total ">No</div>
+        </h2>
+        <!-- <div style="margin-top:20px" class="deltaConfirmed">Estimated Date: </div> -->
+      </div>
+
+      <div class="infoTileConfirmedHeader">
+        <div>
+        <h2 style="font-size:1.3em;" class="title" title="Doses de vaccin
+administrées">Rapid Deployment Network</h2>
+        </div>
+      </div>
+      <div><h6 style="color:red;">Service Unavailable</h6></div>
+  <!--    <div class="bar">
+        <div class="slice" style="background: rgb(221, 221, 221); width: 180px; position:relative;"></div>
+        <div class="slice" style="background: rgb(176, 211, 105); width: 0.79px; left: -180px; position: relative;"></div>
+        <div class="slice" style="background: rgb(58, 154, 80); width: 1.125px; left: -451.79px; position: relative;"></div>
+      </div>
+      <div class="infoTileConfirmed">
+        <div style="color:green;" class="confirmed">50Mbps</div>
+        <div class="deltaConfirmed" title="Nouveaux cas au cours des dernières
+24&nbsp;heures">Signal Strength: <-75dbm</div>
+      </div> -->
+      <div style="margin-top:20px; text-align:center;" class="deltaConfirmed">Estimated Date<br>Not Available</div>
+      </div>
+    </div>`;
+    const bestSignal = function(feature){
+      let properties = feature.properties;
+      let maxValue = Math.max(properties["1st_sigstr"],properties["2nd_sigstr"],properties["3rd_sigstr"],properties["4th_sigstr"]);
+      console.log(maxValue);
+      return maxValue;
+   };
+
+    mapboxgl.accessToken = 'pk.eyJ1Ijoia2V2aW5jb2dzIiwiYSI6ImNra3pnbGoxazAybWcybnJ4MjlyczRpZDgifQ.rZGQ1-YHukms_QaIxxmZoA';
+    var map = new mapboxgl.Map({
+      container: 'map',
+      // Replace YOUR_STYLE_URL with your style URL.
+      //  style: 'mapbox://styles/kevincogs/ckpyontrg1a2817mis9lkfrk0',
+      style: 'mapbox://styles/kevincogs/ckpyontrg1a2817mis9lkfrk0',
+      center: [-62.621557, 45.630748],
+      zoom: 9.5,
+      pitch: 45,
+      bearing: -17.6,
+    });
+
+
+
+    // This example adds 3D terrain to a map using setTerrain with a raster-dem source.
+    // It uses exaggeration to exaggerate the height of the terrain. It also adds a sky layer that shows when the map is highly pitch
+    map.on('load', function() {
+      map.addSource('mapbox-dem', {
+        'type': 'raster-dem',
+        'url': 'mapbox://mapbox.mapbox-terrain-dem-v1',
+        'tileSize': 512,
+        'maxzoom': 14
+      });
+
+      map.addSource('civics', {
+        'type': 'geojson',
+        'data':'civics.geojson'
+      });
+
+      // add the DEM source as a terrain layer with exaggerated height
+      //map.setTerrain({ 'source': 'mapbox-dem', 'exaggeration': 1.5 });
+
+          map.addLayer({
+            'id':'civics-layer',
+            'type':'circle',
+            'source':'civics',
+            'paint': {
+              'circle-radius':3,
+              'circle-color': "#aaa"
+            }
+          });
+
+      // add a sky layer that will show when the map is highly pitched
+      map.addLayer({
+        'id': 'sky',
+        'type': 'sky',
+        'paint': {
+          'sky-type': 'atmosphere',
+          'sky-atmosphere-sun': [0.0, 0.0],
+          'sky-atmosphere-sun-intensity': 15
+        }
+      });
+    });
+
+    // Geocoder
+    // Add the control to the map.
+    map.addControl(
+      new MapboxGeocoder({
+        accessToken: mapboxgl.accessToken,
+        mapboxgl: mapboxgl
+      }), 'top-right'
+    );
+    map.addControl(new mapboxgl.GeolocateControl({
+      positionOptions: {
+        enableHighAccuracy: true
+      },
+      trackUserLocation: true,
+      showUserHeading: true
+    }));
+
+    var features = map.getSource('civics');
+
+    /*forEach((features, feat) => {
+      feat.layer.paint["circle-color"]={a=1,r=1,g=1,b=1};
+    });*/
+
+    // Adds Pop-up window
+    map.on('click', function(e) {
+      var features = map.queryRenderedFeatures(e.point, {
+        layers: ['civics-layer'] // Add my name of the layer here
+      });
+
+      if (!features.length) {
+        return;
+      }
+
+      var feature = features[0];
+      //Create a popup
+      // var popup = new mapboxgl.Popup({ offset: [0, -15] })
+      //   .setLngLat(feature.geometry.coordinates)
+      //   .setHTML(
+      //     '<p>' +"Area: "+ feature.properties.gsa_name + '</p>' +
+      //     '<p>' +"Type: "+ feature.properties.building_t + '</p>'
+      //     )
+      //   .addTo(map);
+      // });
+
+      var rdnSignal = bestSignal(feature);
+
+
+      //Create a popup with conditions
+      // Specify its options, and properties, and add it to the map/
+      if (feature.layer.id == "civics-layer") {
+        var popup = new mapboxgl.Popup({
+            offset: [0, -15]
+          })
+          .setLngLat(feature.geometry.coordinates)
+          .setHTML(popupTemplate(rdnSignal,feature.properties.year))
+          .addTo(map);
+      }
+    });
+
+
+    var specialLayers = ['fiber-simple-2', 'wireless-1', 'nointerent-3'];
+
+    for (let i = 0; i < 3; i++) {
+      let currentLayer = specialLayers[i];;
+      // Change the cursor to a pointer when the mouse is over the places layer.
+      map.on('mouseenter', currentLayer, function() {
+        map.getCanvas().style.cursor = 'pointer';
+      });
+      // Change it back to a pointer when it leaves.
+      map.on('mouseleave', currentLayer, function() {
+        map.getCanvas().style.cursor = '';
+      });
+    }
+  </script>
+</body>
+
+</html>
